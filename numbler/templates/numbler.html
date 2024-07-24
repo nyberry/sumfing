@@ -99,7 +99,7 @@
             {% csrf_token %}
             <button id="next-button">Next</button>
         </form>
-        <button id="reveal-button">Show Answer</button>
+        <button id="reveal-button">Show Answer?</button>
     </div>
 
     <script>
@@ -177,9 +177,9 @@
                 }
             };
 
-            // Show the reveal button after 30 seconds
+            // Show the reveal button after 30 seconds if the next button is not displayed
             setTimeout(() => {
-                if (nextButton.style.display === 'none') {
+                if (getComputedStyle(nextButton).display === 'none') {
                 revealButton.style.display = 'block';
             }
             }, 30000); // 30000 milliseconds = 30 seconds
