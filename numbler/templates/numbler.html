@@ -170,12 +170,11 @@
 
             // Function to reveal the first answer
             window.revealAnswer = function() {
-                if (expressions.length > 0) {
-                    feedback.textContent = `Answer: ${expressions[0]}`;
-                } else {
-                    feedback.textContent = 'No answer available';
-                }
-            };
+                feedback.textContent = `Answer: ${expressions[0]}`;
+                revealButton.style.display = 'none';
+                nextButton.style.display = 'block';
+                } 
+    
 
             // Show the reveal button after 30 seconds if the next button is not displayed
             setTimeout(() => {
