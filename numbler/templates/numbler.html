@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Tiles</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+            position: relative; /* Allow positioning of reveal button */
+            min-height: 100vh; /* Ensure the container takes full viewport height */
+        }
+        .box-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tile-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .box, .tile {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .tile {
+            background-color: #f0f0f0;
+        }
+        .result {
+            font-size: 36px;
+        }
+        .feedback {
+            font-size: 24px;
+        }
+      
+        #next-button, #reveal-button {
+            display: none;
+            position: absolute;
+            bottom: 100px; /* Adjusted for better visibility */
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="result" id="result">= {{ result }}</div>
+        <div class="box-container" id="box-container">
+            {% for box in boxes %}
+            <div class="box" data-index="{{ forloop.counter }}"></div>
+            {% endfor %}
+        </div>
+        <div class="tile-container" id="num-tiles">
+            {% for num_tile in num_tiles %}
+                <div class="tile" data-value="{{ num_tile }}" data-id="num{{ forloop.counter }}">{{ num_tile }}</div>
+            {% endfor %}
+        </div>
+        <div class="tile-container" id="op-tiles">
+            <div class="tile" data-value="+" data-id="op1">+</div>
+            <div class="tile" data-value="-" data-id="op2">-</div>
+            <div class="tile" data-value="*" data-id="op3">*</div>
+            <div class="tile" data-value="/" data-id="op4">/</div>
+            {% if difficulty == "Hard" %}
+                <div class="tile" data-value="!" data-id="op5">!</div>
+                <div class="tile" data-value="^" data-id="op6">^</div>
+            {% endif %}
+        </div>
+        <div class="feedback" id="feedback">({{ difficulty }})</div>
+        <form action="{% url 'next_puzzle' %}" method="post">
+            {% csrf_token %}
+            <button id="next-button">Next</button>
+        </form>
+        <button id="reveal-button">Show Answer</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const boxes = document.querySelectorAll('.box');
+            const tiles = document.querySelectorAll('.tile');
+            const feedback = document.getElementById('feedback');
+            const nextButton = document.getElementById('next-button');
+            const revealButton = document.getElementById('reveal-button');
+            let selectedTiles = [];
+            let expressions = [];
+
+            // Parse the expressions from Django template
+            try {
+                expressions = JSON.parse('{{ expressions|safe|escapejs }}');
+                console.log('Parsed expressions:', expressions); // Debugging
+            } catch (e) {
+                console.error('Error parsing expressions:', e);
+            }
+
+            function checkExpression() {
+                const expression = selectedTiles.join('');
+                if (expressions.includes(expression)) {
+                    feedback.textContent = 'Correct';
+                    nextButton.style.display = 'block';
+                    revealButton.style.display = 'none'; // Hide the button when correct
+                } else {
+                    feedback.textContent = 'Incorrect';
+                }
+            }
+
+            tiles.forEach(tile => {
+                tile.addEventListener('click', function () {
+                    const emptyBox = [...boxes].find(box => !box.dataset.value);
+                    if (emptyBox) {
+                        emptyBox.textContent = this.textContent;
+                        emptyBox.dataset.value = this.dataset.value;
+                        emptyBox.dataset.id = this.dataset.id;
+                        this.style.visibility = 'hidden';
+                        selectedTiles.push(this.dataset.value);
+                        if (selectedTiles.length === boxes.length) {
+                            checkExpression();
+                        }
+                    }
+                });
+            });
+
+            boxes.forEach(box => {
+                box.addEventListener('click', function () {
+                    if (this.dataset.value) {
+                        const tile = [...tiles].find(tile => tile.dataset.id === this.dataset.id);
+                        if (tile) {
+                            tile.style.visibility = 'visible';
+                        }
+                        selectedTiles = selectedTiles.filter(value => value !== this.dataset.value);
+                        this.textContent = '';
+                        delete this.dataset.value;
+                        delete this.dataset.id;
+                        if (selectedTiles.length < boxes.length) {
+                            feedback.textContent = `(${document.querySelector('#feedback').textContent})`;
+                            nextButton.style.display = 'none';
+                        }
+                    }
+                });
+            });
+
+            // Function to reveal the first answer
+            window.revealAnswer = function() {
+                if (expressions.length > 0) {
+                    feedback.textContent = `Answer: ${expressions[0]}`;
+                } else {
+                    feedback.textContent = 'No answer available';
+                }
+            };
+
+            // Show the reveal button after 30 seconds
+            setTimeout(() => {
+                revealButton.style.display = 'block';
+            }, 30000); // 30000 milliseconds = 30 seconds
+
+            // Attach click event for the reveal button
+            revealButton.addEventListener('click', function() {
+                window.revealAnswer();
+            });
+        });
+    </script>
+</body>
+</html>
