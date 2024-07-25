@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Tiles</title>
     <style>
-
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,71 +12,121 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            background-color: #e7e7e7;
         }
-
 
         .container {
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-top: 50px;
-            position: relative; /* Allow positioning of reveal button */
-            min-height: 80vh; /* Ensure the container takes full viewport height */
+            position: relative;
+            min-height: 80vh;
         }
+
         .box-container {
             display: flex;
             margin-bottom: 20px;
         }
+
         .tile-container {
             display: flex;
             margin-bottom: 10px;
         }
+
         .box, .tile {
             width: 50px;
             height: 50px;
-            border: 1px solid #000;
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 5px;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+            background-color: white;
+            color: white;
         }
-        .tile {
-            background-color: #f0f0f0;
+
+        .tile-container .tile[data-value="1"],.tile-container .tile[data-value="2"],.tile-container .tile[data-value="3"],
+        .tile-container .tile[data-value="4"],.tile-container .tile[data-value="5"],.tile-container .tile[data-value="6"],
+        .tile-container .tile[data-value="7"],.tile-container .tile[data-value="8"],.tile-container .tile[data-value="9"],
+        .tile-container .tile[data-value="0"]
+        {
+            background-color: rgb(0, 115, 255);
         }
+
+        .tile-container .tile[data-value="+"] {
+            background-color: red;
+        }
+
+        .tile-container .tile[data-value="-"] {
+            background-color: red;
+        }
+
+        .tile-container .tile[data-value="*"] {
+            background-color: red;
+        }
+
+        .tile-container .tile[data-value="/"] {
+            background-color: red;
+        }
+
+        .tile-container .tile[data-value="!"] {
+            background-color: purple;
+        }
+
+        .tile-container .tile[data-value="^"] {
+            background-color: purple;
+        }
+
+        .tile:hover {
+            transform: translateY(-4px);
+        }
+
         .result {
             font-size: 36px;
+            margin-bottom: 20px;
         }
+
         .feedback {
             font-size: 24px;
+            margin-bottom: 10px;
         }
+
         .tick {
             display: block;
             font-size: 148px;
             color: green;
-            margin-top: 10px; /* Adjust spacing between text and tick */
+            margin-top: 10px;
         }
-      
-        #next-button, #reveal-button {
+
+        #next-button, #reveal-button, #hint1-button, #hint2-button {
             display: none;
-            position: absolute;
-            bottom: 100px; /* Adjusted for better visibility */
+            position: relative;
             padding: 10px 20px;
-            font-size: 16px;
+            font-size: 24px;
             cursor: pointer;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="result" id="result">= {{ result }}</div>
         <div class="box-container" id="box-container">
             {% for box in boxes %}
             <div class="box" data-index="{{ forloop.counter }}"></div>
             {% endfor %}
         </div>
+        <div class="result" id="result">= {{ result }}</div>
+        <div class="feedback" id="feedback">({{ difficulty }})</div>
+        <br><br>
         <div class="tile-container" id="num-tiles">
             {% for num_tile in num_tiles %}
                 <div class="tile" data-value="{{ num_tile }}" data-id="num{{ forloop.counter }}">{{ num_tile }}</div>
@@ -88,18 +137,22 @@
             <div class="tile" data-value="-" data-id="op2">-</div>
             <div class="tile" data-value="*" data-id="op3">*</div>
             <div class="tile" data-value="/" data-id="op4">/</div>
-            {% if difficulty == "Hard" %}
+        </div>
+        {% if difficulty == "Hard" %}
+            <div class="tile-container" id="extra-op-tiles">
                 <div class="tile" data-value="!" data-id="op5">!</div>
                 <div class="tile" data-value="^" data-id="op6">^</div>
-            {% endif %}
-        </div>
-        <div class="feedback" id="feedback">({{ difficulty }})</div>
+            </div>
+        {% endif %}
         <div class="tick" id="tick"></div>
         <form action="{% url 'next_puzzle' %}" method="post">
             {% csrf_token %}
+            <input type="hidden" name="hint_level" id="hint-level-input">
             <button id="next-button">Next</button>
         </form>
-        <button id="reveal-button">Show Answer?</button>
+        <button id="hint1-button">Hint?</button>
+        <button id="hint2-button">Another hint?</button>
+        <button id="reveal-button">Show answer</button>
     </div>
 
     <script>
@@ -109,45 +162,60 @@
             const feedback = document.getElementById('feedback');
             const tick = document.getElementById('tick');
             const nextButton = document.getElementById('next-button');
+            const hint1Button = document.getElementById('hint1-button');
+            const hint2Button = document.getElementById('hint2-button');
             const revealButton = document.getElementById('reveal-button');
+            const standardDelay = 100
             let selectedTiles = [];
             let expressions = [];
+            let hint_answer = [];
+            let hint_level = 0;
 
-            // Parse the expressions from Django template
-            try {
-                expressions = JSON.parse('{{ expressions|safe|escapejs }}');
-                console.log('Parsed expressions:', expressions); // Debugging
-            } catch (e) {
-                console.error('Error parsing expressions:', e);
-            }
-
+            expressions = JSON.parse('{{ expressions|safe|escapejs }}');
+            hint_answer=expressions[0];
+            console.log(expressions);
+            console.log(hint_answer);
+            
             function checkExpression() {
-                const expression = selectedTiles.join('');
+                const expression = [...boxes].map(box => box.dataset.value || '').join('');
+                console.log(expression);
                 if (expressions.includes(expression)) {
                     feedback.textContent = 'Correct';
-                    tick.innerHTML = '&#10004;'; // Unicode for check mark
+                    tick.innerHTML = '&#10004;';
+                    hint1Button.style.display = 'none'
+                    hint2Button.style.display = 'none'
+                    revealButton.style.display = 'none';
+                    document.getElementById('hint-level-input').value = hint_level;
                     nextButton.style.display = 'block';
-                    revealButton.style.display = 'none'; // Hide the button when correct
                 } else {
                     feedback.textContent = 'Incorrect';
                 }
             }
 
+            function applyTileStyle(tile, box) {
+                box.style.backgroundColor = getComputedStyle(tile).backgroundColor;
+                box.style.color = getComputedStyle(tile).color;
+            }
+
             tiles.forEach(tile => {
-                tile.addEventListener('click', function () {
+                tile.addEventListener('click', handleTileClick)
+            });
+                
+                function handleTileClick () {
                     const emptyBox = [...boxes].find(box => !box.dataset.value);
                     if (emptyBox) {
                         emptyBox.textContent = this.textContent;
                         emptyBox.dataset.value = this.dataset.value;
                         emptyBox.dataset.id = this.dataset.id;
                         this.style.visibility = 'hidden';
+                        applyTileStyle(this, emptyBox);
                         selectedTiles.push(this.dataset.value);
+                        console.log (selectedTiles, selectedTiles.length);
                         if (selectedTiles.length === boxes.length) {
                             checkExpression();
                         }
                     }
-                });
-            });
+                };
 
             boxes.forEach(box => {
                 box.addEventListener('click', function () {
@@ -160,34 +228,196 @@
                         this.textContent = '';
                         delete this.dataset.value;
                         delete this.dataset.id;
+                        this.style.backgroundColor = '';
+                        this.style.color = '';
+                        if (hint_level>=1) {setLightBackgroundColors()};
+                        if (hint_level===2) {showOperators()};
+                        if (hint_level===3) {showAnswers()};
                         if (selectedTiles.length < boxes.length) {
-                            feedback.textContent = ``;
+                            feedback.textContent = '({{ difficulty }})';
                             nextButton.style.display = 'none';
                         }
                     }
                 });
             });
 
-            // Function to reveal the first answer
-            window.revealAnswer = function() {
-                feedback.textContent = `Answer: ${expressions[0]}`;
-                revealButton.style.display = 'none';
-                nextButton.style.display = 'block';
-                } 
-    
+            window.revealHint1 = function() {
+                hint_level = 1
+                clearBoxesAndTiles();
+                setTimeout(() => {
+                    if (getComputedStyle(hint2Button).display === 'none') {
+                        hint2Button.style.display = 'block';
+                    }
+                }, standardDelay);
 
-            // Show the reveal button after 30 seconds if the next button is not displayed
+                hint2Button.addEventListener('click', function() {
+                window.revealHint2();
+                });
+            };
+
+
+            window.revealHint2 = function() {
+                hint_level = 2
+                clearBoxesAndTiles();
+                setTimeout(() => {
+                    if (getComputedStyle(revealButton).display === 'none') {
+                        revealButton.style.display = 'block';
+                    }
+                }, standardDelay);
+
+                revealButton.addEventListener('click', function() {
+                window.revealAnswer();
+                });
+            };
+
+            window.revealAnswer = function() {
+                hint_level = 3
+                clearBoxesAndTiles();
+                disableEventListeners();
+                setTimeout(() => {
+                    if (getComputedStyle(nextButton).display === 'none') {
+                        document.getElementById('hint-level-input').value = hint_level;
+                        nextButton.style.display = 'block';
+                    }
+                }, standardDelay);
+            };
+
+            function disableEventListeners() {
+                tiles.forEach(tile => {
+                tile.removeEventListener('click', handleTileClick);
+                });
+            }
+
+            function showOperators () {
+                const answer = hint_answer;
+                [...answer].forEach((char, index) => {
+                    const box = boxes[index];
+                    const tile = [...tiles].find(tile => tile.dataset.value === char);
+                    if (tile && !box.dataset.value) {
+                        const tileValue = tile.dataset.value;
+                        if (isNaN(tileValue) || tileValue < 0 || tileValue > 9) {
+                            revealBox(box, tile);
+                            }
+                        }                       
+                    });
+                };
+
+
+            function showAnswers () {
+                const answer = hint_answer;
+                [...answer].forEach((char, index) => {
+                    const box = boxes[index];
+                    const tile = [...tiles].find(tile => tile.dataset.value === char);
+                    if (tile && !box.dataset.value) {revealBox(box, tile);}                       
+                    });
+                };
+
+
+            function revealBox (box, tile) {
+                box.textContent = tile.textContent;
+                box.dataset.value = tile.dataset.value;
+                box.dataset.id = tile.dataset.id;
+                tile.style.visibility = 'hidden';
+                applyTileStyle(tile, box);
+                selectedTiles.push(tile.dataset.value)
+                };
+                
+            function setLightBackgroundColors() {
+                const answer = hint_answer;
+                [...answer].forEach((char, index) => {
+                    const box = boxes[index];
+                    const tile = [...tiles].find(tile => tile.dataset.value === char);
+                    const percent = 75
+                    if (tile && !box.dataset.value) {
+                        const tileColor = getComputedStyle(tile).backgroundColor;
+                        box.style.backgroundColor = lightenColor(tileColor, percent);
+                    }
+                });
+            }
+
+            function lightenColor(tileColor, percent) {
+                // Function to extract RGB values from an 'rgb(r, g, b)' string
+                function parseRgb(rgbString) {
+                    const rgbPattern = /^rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)$/;
+                    const result = rgbPattern.exec(rgbString);
+
+                    if (result) {
+                        return {
+                            r: parseInt(result[1], 10),
+                            g: parseInt(result[2], 10),
+                            b: parseInt(result[3], 10)
+                        };
+                    } else {
+                        throw new Error('Invalid RGB string format');
+                    }
+                }
+
+                // Function to lighten an RGB color
+                function lighten(r, g, b, percent) {
+                    const newR = Math.min(255, Math.round(r + (255 - r) * percent / 100));
+                    const newG = Math.min(255, Math.round(g + (255 - g) * percent / 100));
+                    const newB = Math.min(255, Math.round(b + (255 - b) * percent / 100));
+
+                    return `rgb(${newR}, ${newG}, ${newB})`;
+                }
+
+                // Parse the RGB string
+                const { r, g, b } = parseRgb(tileColor);
+
+                // Lighten the color by the specified percentage
+                return lighten(r, g, b, percent);
+            }
+
+
+            function clearBoxesAndTiles() {
+            boxes.forEach(box => {
+                if (box.dataset.value) {
+                    const tile = [...tiles].find(tile => tile.dataset.id === box.dataset.id);
+                    if (tile) {
+                        tile.style.visibility = 'visible';
+                    }
+                    box.textContent = '';
+                    delete box.dataset.value;
+                    delete box.dataset.id;
+                    box.style.backgroundColor = '';
+                    box.style.color = '';
+                }
+            });
+
+            console.log('hint level', hint_level);
+
+            if (hint_level>=1) {
+                setLightBackgroundColors()
+            };
+
+            selectedTiles = [];
+
+            if (hint_level===2) {
+                showOperators()
+            };
+
+            if (hint_level===3) {
+                showAnswers()
+            };
+
+            feedback.textContent = '({{ difficulty }})';
+            tick.innerHTML = '';
+            hint1Button.style.display = 'none';
+            hint2Button.style.display = 'none';
+            revealButton.style.display = 'none';
+        }
+
             setTimeout(() => {
                 if (getComputedStyle(nextButton).display === 'none') {
-                revealButton.style.display = 'block';
-            }
-            }, 30000); // 30000 milliseconds = 30 seconds
+                    hint1Button.style.display = 'block';
+                }
+            }, standardDelay);
 
-            // Attach click event for the reveal button
-            revealButton.addEventListener('click', function() {
-                window.revealAnswer();
+            hint1Button.addEventListener('click', function() {
+                window.revealHint1();
             });
         });
     </script>
+
 </body>
 </html>
