@@ -5,7 +5,7 @@ import math
 from datetime import datetime, timedelta
 
 # Define the tiles
-nums = ['1','1','2','2','2','3','3','4','4','5','5','6']
+nums = ['1','1','1','2','2','2','3','3','3','4','4','5','5','6','7','8','9']
 ops1 = ['+','-','*','/']
 ops2= ['^', '!']
 ops = ops1+ops2
@@ -80,7 +80,7 @@ def evaluate_bidmas(expr):
 
     # evaluate
     result = eval(preprocessed_expr)
-    print (f'{expr} -> {preprocessed_expr} = {result}')
+    #print (f'{expr} -> {preprocessed_expr} = {result}')
     return result
 
 def preprocess_expression(expr):
@@ -103,10 +103,6 @@ def preprocess_expression(expr):
 
     return expr
 
-expr = "6+3!*2"
-preprocessed_expr = preprocess_expression(expr)
-result = eval(preprocessed_expr)
-print(result)  # Output will be 6 + 6 * 2 = 18
 
 
 # Function to generate all valid sums
@@ -235,7 +231,7 @@ def generate_puzzle():
 puzzles = {}
 start_date = datetime.today()
 
-for i in range (2):
+for i in range (10):
     date = start_date + timedelta(days=i)
     date_str = date.strftime("%Y-%m-%d")
     puzzle = None

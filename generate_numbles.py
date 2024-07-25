@@ -166,7 +166,7 @@ def generate_puzzle():
         minlength = 5,
         maxlength = 5,
         order = "DODOD",
-        maxval = 100)
+        maxval = 20)
     if sums:
         easy_sum = random.choice(sums[-10:])
 
@@ -175,7 +175,7 @@ def generate_puzzle():
         minlength = 6,
         maxlength = 6,
         order = None,
-        maxval = 120)
+        maxval = 100)
     if sums:
         medium_sum = random.choice(sums[-10:])
 
