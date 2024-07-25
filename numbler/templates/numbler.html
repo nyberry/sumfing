@@ -109,12 +109,19 @@
             padding: 10px 20px;
             font-size: 24px;
             cursor: pointer;
-            background-color: green;
+            background-color: rgb(240, 140, 0);
             color: white;
             border: none;
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
+        #next-button {
+            background-color: rgb(15, 161, 15)
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -135,8 +142,8 @@
         <div class="tile-container" id="op-tiles">
             <div class="tile" data-value="+" data-id="op1">+</div>
             <div class="tile" data-value="-" data-id="op2">-</div>
-            <div class="tile" data-value="*" data-id="op3">*</div>
-            <div class="tile" data-value="/" data-id="op4">/</div>
+            <div class="tile" data-value="*" data-id="op3">x</div>
+            <div class="tile" data-value="/" data-id="op4">÷</div>
         </div>
         {% if difficulty == "Hard" %}
             <div class="tile-container" id="extra-op-tiles">
@@ -165,7 +172,7 @@
             const hint1Button = document.getElementById('hint1-button');
             const hint2Button = document.getElementById('hint2-button');
             const revealButton = document.getElementById('reveal-button');
-            const standardDelay = 100
+            const standardDelay = 5000
             let selectedTiles = [];
             let expressions = [];
             let hint_answer = [];
@@ -210,7 +217,7 @@
                         this.style.visibility = 'hidden';
                         applyTileStyle(this, emptyBox);
                         selectedTiles.push(this.dataset.value);
-                        console.log (selectedTiles, selectedTiles.length);
+                        console.log ('Selected tiles:' , selectedTiles, 'Number of tiles selected:', selectedTiles.length);
                         if (selectedTiles.length === boxes.length) {
                             checkExpression();
                         }
@@ -224,7 +231,7 @@
                         if (tile) {
                             tile.style.visibility = 'visible';
                         }
-                        selectedTiles = selectedTiles.filter(value => value !== this.dataset.value);
+                        selectedTiles.pop(this.dataset.value) 
                         this.textContent = '';
                         delete this.dataset.value;
                         delete this.dataset.id;
@@ -233,6 +240,7 @@
                         if (hint_level>=1) {setLightBackgroundColors()};
                         if (hint_level===2) {showOperators()};
                         if (hint_level===3) {showAnswers()};
+                        console.log ('Selected tiles:' , selectedTiles, 'Number of tiles selected:', selectedTiles.length);
                         if (selectedTiles.length < boxes.length) {
                             feedback.textContent = '({{ difficulty }})';
                             nextButton.style.display = 'none';
@@ -279,7 +287,7 @@
                         document.getElementById('hint-level-input').value = hint_level;
                         nextButton.style.display = 'block';
                     }
-                }, standardDelay);
+                }, 2000);
             };
 
             function disableEventListeners() {

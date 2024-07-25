@@ -14,9 +14,15 @@ def numbler(request):
 
     num_tiles = puzzle['Tiles']
 
-    # Initialize session variable for difficulty if not set
+    # Initialize session variable for difficulty if not set, or if completed
     if 'difficulty' not in request.session:
         request.session['difficulty'] = 'Easy'
+
+    if request.session['difficulty'] == "Completed":
+        request.session['difficulty'] = 'Easy'
+
+
+
     
     difficulty = request.session['difficulty']
     result = puzzle[difficulty][0]
@@ -61,6 +67,12 @@ def next_puzzle(request):
     elif current_difficulty == 'Medium':
         request.session['difficulty'] = 'Hard'
     elif current_difficulty == 'Hard':
+        request.session['difficulty'] = 'Completed'
+
+
+    # If the puzzle completed
+    if request.session['difficulty'] == 'Completed':
+        
         # Get the current date and time
         now = datetime.datetime.now()
 
