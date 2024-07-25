@@ -10,25 +10,55 @@
             flex-direction: column;
             align-items: center;
             margin-top: 50px;
-            position: relative; /* Allow positioning of reveal button */
-            min-height: 100vh; /* Ensure the container takes full viewport height */
+            position: relative;
+            min-height: 100vh;
             font-size: 24px;
+        }
+        #shareButton {
+            background-color: #25D366; /* WhatsApp green color */
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        #shareButton:hover {
+            background-color: #1EBE56; /* Slightly darker green */
+        }
+        #shareButton:active {
+            background-color: #148F3D; /* Even darker green */
+        }
+        #shareButton i {
+            margin-right: 10px; /* Space between icon and text */
         }
     </style>
 </head>
+<body>
+    <div class="container">
+        <div id="resultMessage">{{ result_message }}</div>
+        <br>
+       <!-- Button to share result by WhatsApp -->
+        <button id="shareButton" onclick="shareByWhatsApp()">
+        Share
+        </button>
+        <br>
+        <div>{{ next_game_message }}</div>
+    </div>
 
-        <body>
-            <div class="container">
-                Your result:
-                <br>
-                Easy: {{ easy_result }}
-                <br>
-                Medium: {{ medium_result }}
-                <br>
-                Hard: {{ hard_result }}
-                <br>
-                <br>
-                {{ next_game_message }}
-            </div>
-        </body>
+    <script>
+        // Function to share result by WhatsApp
+        function shareByWhatsApp() {
+            var result = document.getElementById('resultMessage').innerText;
+            var whatsappURL = "https://api.whatsapp.com/send?text=" + encodeURIComponent(result);
+
+            // Open the WhatsApp URL in a new tab/window
+            window.open(whatsappURL, '_blank');
+        }
+    </script>
+</body>
 </html>

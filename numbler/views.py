@@ -100,13 +100,14 @@ def next_puzzle(request):
                 result = f'✔ ({hints_given[i]} hints)'
             hints_message.append(result)    
         
+        result_message = f'NumGoose #1\n\nEasy: {hints_message[0]}\nMedium: {hints_message[2]}\nHard: {hints_message[2]}\n'
+            
         next_game_message = f"Next puzzle in {hours} hours and {minutes} minutes"
 
+
         context = {
+            'result_message':result_message,
             'next_game_message':next_game_message,
-            'easy_result': hints_message[0],
-            'medium_result': hints_message[1],
-            'hard_result': hints_message[2]
         }
 
         return render (request, 'completed.html', context)
