@@ -173,6 +173,7 @@
             const hint2Button = document.getElementById('hint2-button');
             const revealButton = document.getElementById('reveal-button');
             const standardDelay = 5000
+            let unsolved = true;
             let selectedTiles = [];
             let expressions = [];
             let hint_answer = [];
@@ -188,6 +189,7 @@
                 console.log(expression);
                 if (expressions.includes(expression)) {
                     feedback.textContent = 'Correct';
+                    unsolved = false;
                     tick.innerHTML = '&#10004;';
                     hint1Button.style.display = 'none'
                     hint2Button.style.display = 'none'
@@ -253,8 +255,10 @@
                 hint_level = 1
                 clearBoxesAndTiles();
                 setTimeout(() => {
-                    if (getComputedStyle(hint2Button).display === 'none') {
-                        hint2Button.style.display = 'block';
+                    if (unsolved) {
+                        if (getComputedStyle(hint2Button).display === 'none') {
+                            hint2Button.style.display = 'block';
+                        }
                     }
                 }, standardDelay);
 
@@ -268,10 +272,13 @@
                 hint_level = 2
                 clearBoxesAndTiles();
                 setTimeout(() => {
-                    if (getComputedStyle(revealButton).display === 'none') {
-                        revealButton.style.display = 'block';
-                    }
+                    if (unsolved) {
+                        if (getComputedStyle(revealButton).display === 'none') {
+                            revealButton.style.display = 'block';
+                        }
+                }
                 }, standardDelay);
+
 
                 revealButton.addEventListener('click', function() {
                 window.revealAnswer();
