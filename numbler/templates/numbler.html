@@ -126,6 +126,7 @@
 </head>
 <body>
     <div class="container">
+        <div>Num🪿Goose</div>
         <div class="box-container" id="box-container">
             {% for box in boxes %}
             <div class="box" data-index="{{ forloop.counter }}"></div>
@@ -172,7 +173,7 @@
             const hint1Button = document.getElementById('hint1-button');
             const hint2Button = document.getElementById('hint2-button');
             const revealButton = document.getElementById('reveal-button');
-            const standardDelay = 5000
+            const standardDelay = 10000
             let unsolved = true;
             let selectedTiles = [];
             let expressions = [];
