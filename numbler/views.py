@@ -39,6 +39,9 @@ def numbler(request):
 
 def next_puzzle(request):
 
+    today = datetime.date.today()
+    date_str = today.strftime("%Y-%m-%d")
+
     if 'hints' not in request.session:
         request.session['hints'] = ['-1','-1','-1']
 
@@ -89,16 +92,18 @@ def next_puzzle(request):
         hints_message = []
         for i in range(len(hints_given)):
             if hints_given[i]=='-1':
-                result = " "
+                result = "?"
             elif hints_given[i]=='0':
-                result = "✔"
+                result = "✅"
+            elif hints_given[i]=='1':
+                result =f'💡1 hint'
+            elif hints_given[i]=='2':
+                result =f'💡💡2 hints'
             elif hints_given[i]=='3':
-                result = "✘"
-            else:
-                result = f'✔ ({hints_given[i]} hints)'
+                result = "❌"
             hints_message.append(result)    
         
-        result_message = f'NumGoose #1\n\nEasy: {hints_message[0]}\nMedium: {hints_message[2]}\nHard: {hints_message[2]}\n'
+        result_message = f'NumGoose 🪿 {date_str}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\nplay NumGoose 🪿\nnyberry.pythonanywhere.com'
             
         next_game_message = f"Next puzzle in {hours} hours and {minutes} minutes"
 
