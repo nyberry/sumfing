@@ -20,54 +20,6 @@ def safe_eval(expr):
                 return int(result)
     except:
         return None
-    
-def evaluate_left_to_right(expr):
-
-    # reject expressions that don't start with a valid character
-    if expr[0] not in "1234567890-":
-        return None
- 
-    # Tokenize the expression
-    expr = "0"+expr
-    tokens = re.findall(r'\d+|[+\-/^*!]', expr)
-    #print(tokens)
-    
-    if not tokens:
-        return None
-
-    # Convert the first token to a number
-    result = float(tokens.pop(0))
-
-    while tokens:
-        # Get the operator and the next number
-        operator = tokens.pop(0)
-
-        if operator == '!':
-            if result<0:
-                return None
-            if result != int(result):
-                return None
-            if result >=10:
-                return None
-            else:
-                result = factorial(int(result))
-
-        else:
-            next_number = float(tokens.pop(0))
-
-            # Evaluate the expression from left to right
-            if operator == '+':
-                result += next_number
-            elif operator == '-':
-                result -= next_number
-            elif operator == '*':
-                result *= next_number
-            elif operator == '/':
-                result /= next_number
-            elif operator == "^":
-                result = result**next_number
-
-    return result
 
 def evaluate_bidmas(expr):
 
@@ -201,7 +153,7 @@ def generate_puzzle():
         minlength = 5,
         maxlength = 5,
         order = "DODOD",
-        maxval = 100)
+        maxval = 20)
     if sums:
         easy_sum = random.choice(sums[-10:])
 
@@ -210,7 +162,7 @@ def generate_puzzle():
         minlength = 6,
         maxlength = 6,
         order = None,
-        maxval = 120)
+        maxval = 100)
     if sums:
         medium_sum = random.choice(sums[-10:])
 
@@ -231,7 +183,7 @@ def generate_puzzle():
 puzzles = {}
 start_date = datetime.today()
 
-for i in range (10):
+for i in range (5):
     date = start_date + timedelta(days=i)
     date_str = date.strftime("%Y-%m-%d")
     puzzle = None
