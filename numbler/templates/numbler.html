@@ -188,9 +188,8 @@
                 const expression = [...boxes].map(box => box.dataset.value || '').join('');
                 console.log(expression);
                 if (expressions.includes(expression)) {
-                    feedback.textContent = 'Correct';
+                    feedback.textContent = '✅ Correct ✅';
                     unsolved = false;
-                    tick.innerHTML = '&#10004;';
                     hint1Button.style.display = 'none'
                     hint2Button.style.display = 'none'
                     revealButton.style.display = 'none';
