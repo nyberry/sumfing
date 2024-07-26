@@ -129,7 +129,6 @@
     <div class="container">
         <div>Num🪿Goose</div>
         <br>
-        <br>
         <div class="box-container" id="box-container">
             {% for box in boxes %}
             <div class="box" data-index="{{ forloop.counter }}"></div>
@@ -137,7 +136,7 @@
         </div>
         <div class="result" id="result">= {{ result }}</div>
         <div class="feedback" id="feedback">({{ difficulty }})</div>
-        <br><br>
+        <br>
         <div class="tile-container" id="num-tiles">
             {% for num_tile in num_tiles %}
                 <div class="tile" data-value="{{ num_tile }}" data-id="num{{ forloop.counter }}">{{ num_tile }}</div>
