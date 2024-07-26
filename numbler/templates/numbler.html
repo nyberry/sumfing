@@ -182,14 +182,11 @@
 
             expressions = JSON.parse('{{ expressions|safe|escapejs }}');
             hint_answer=expressions[0];
-            console.log(expressions);
-            console.log(hint_answer);
-            
+    
             function checkExpression() {
                 const expression = [...boxes].map(box => box.dataset.value || '').join('');
-                console.log(expression);
                 if (expressions.includes(expression)) {
-                    feedback.textContent = '✅ Correct ✅';
+                    feedback.textContent = 'Correct✅';
                     unsolved = false;
                     hint1Button.style.display = 'none'
                     hint2Button.style.display = 'none'
@@ -219,7 +216,6 @@
                         this.style.visibility = 'hidden';
                         applyTileStyle(this, emptyBox);
                         selectedTiles.push(this.dataset.value);
-                        console.log ('Selected tiles:' , selectedTiles, 'Number of tiles selected:', selectedTiles.length);
                         if (selectedTiles.length === boxes.length) {
                             checkExpression();
                         }
@@ -242,7 +238,6 @@
                         if (hint_level>=1) {setLightBackgroundColors()};
                         if (hint_level===2) {showOperators()};
                         if (hint_level===3) {showAnswers()};
-                        console.log ('Selected tiles:' , selectedTiles, 'Number of tiles selected:', selectedTiles.length);
                         if (selectedTiles.length < boxes.length) {
                             feedback.textContent = '({{ difficulty }})';
                             nextButton.style.display = 'none';

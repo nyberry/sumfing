@@ -113,13 +113,15 @@ def next_puzzle(request):
             hints_message.append(result)    
         
         date_str = request.session['date_str']
-        result_message = f'NumGoose 🪿 {date_str}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nnyberry.pythonanywhere.com'
-            
+        html_message = f'NumGoose 🪿 {date_str}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n'
+        whatsapp_message = f'NumGoose 🪿 {date_str}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nnyberry.pythonanywhere.com'
+           
         next_game_message = f"Next puzzle in {hours} hours and {minutes} minutes"
 
 
         context = {
-            'result_message':result_message,
+            'html_message':html_message,
+            'whatsapp_message':whatsapp_message,
             'next_game_message':next_game_message,
         }
 

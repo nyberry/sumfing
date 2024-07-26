@@ -49,7 +49,8 @@
     </style>
 <body>
     <div class="container">
-        <div id="resultMessage">{{ result_message }}</div>
+        <div id="resultMessage">{{ html_message }}</div>
+        <div id="whatsappMessage" style="display: none;">{{ whatsapp_message }}</div>
         <br>
         <!-- Button to share result by WhatsApp -->
         <button id="shareButton" onclick="shareByWhatsApp()">
@@ -62,7 +63,7 @@
     <script>
         // Function to share result by WhatsApp
         function shareByWhatsApp() {
-            var result = document.getElementById('resultMessage').innerText;
+            var result = document.getElementById('whatsappMessage').innerText;
             var whatsappURL = "https://api.whatsapp.com/send?text=" + encodeURIComponent(result);
 
             // Open the WhatsApp URL in a new tab/window
