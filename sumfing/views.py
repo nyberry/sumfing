@@ -13,14 +13,17 @@ def welcome(request):
     date_str = today.strftime("%Y-%m-%d")
     
     puzzle = puzzles.get(date_str)
-    print(puzzle)
 
     if puzzle == None:
         puzzle = puzzles['2024-07-25']
 
+    start_date = datetime.datetime.strptime("2024-07-25", "%Y-%m-%d").date()
+    days_since_start = (today - start_date).days
+
     request.session['difficulty']='Easy'
     request.session['puzzle']=puzzle
     request.session['date_str']=date_str
+    request.session['game_no']=days_since_start
 
     return redirect('sumfing')
 
@@ -41,7 +44,7 @@ def sumfing(request):
     boxes = [tile for tile in expressions[0]]
 
     context = {
-        'difficulty': difficulty,
+        'difficulty': difficulty.lower(),
         'num_tiles': num_tiles,
         'boxes': boxes,
         'result': result,
@@ -115,10 +118,11 @@ def next_puzzle(request):
             hints_message.append(result)    
         
         date_str = request.session['date_str']
-        html_message = f'sum🎓fing {date_str}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n'
-        whatsapp_message = f'sum🎓fing {date_str}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nsumfing.com'
+        game_no = request.session['game_no']
+        html_message = f'Sumfing #{game_no} {date_str}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n'
+        whatsapp_message = f'Sumfing #{game_no} {date_str}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nPlay at sumfing.com'
            
-        next_game_message = f"sum🎓fing else in {hours} hours and {minutes} minutes"
+        next_game_message = f"Sumfing else in {hours} hours and {minutes} minutes"
 
 
         context = {

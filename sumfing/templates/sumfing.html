@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SumFing</title>
+    <title>sumfing</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -127,7 +127,7 @@
 </head>
 <body>
     <div class="container">
-        <div>sum🎓fing</div>
+        <div id="headline">sumfing</div>
         <br>
         <div class="box-container" id="box-container">
             {% for box in boxes %}
@@ -135,7 +135,7 @@
             {% endfor %}
         </div>
         <div class="result" id="result">= {{ result }}</div>
-        <div class="feedback" id="feedback">({{ difficulty }})</div>
+        <div class="feedback" id="feedback">🤓</div>
         <br>
         <div class="tile-container" id="num-tiles">
             {% for num_tile in num_tiles %}
@@ -148,13 +148,12 @@
             <div class="tile" data-value="*" data-id="op3">x</div>
             <div class="tile" data-value="/" data-id="op4">÷</div>
         </div>
-        {% if difficulty == "Hard" %}
+        {% if difficulty == "hard" %}
             <div class="tile-container" id="extra-op-tiles">
                 <div class="tile" data-value="!" data-id="op5">!</div>
                 <div class="tile" data-value="^" data-id="op6">^</div>
             </div>
         {% endif %}
-        <div class="tick" id="tick"></div>
         <form action="{% url 'next_puzzle' %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="hint_level" id="hint-level-input">
@@ -170,20 +169,23 @@
             const boxes = document.querySelectorAll('.box');
             const tiles = document.querySelectorAll('.tile');
             const feedback = document.getElementById('feedback');
-            const tick = document.getElementById('tick');
+            const headline = document.getElementById('headline');
             const nextButton = document.getElementById('next-button');
             const hint1Button = document.getElementById('hint1-button');
             const hint2Button = document.getElementById('hint2-button');
             const revealButton = document.getElementById('reveal-button');
-            const standardDelay = 10000
+            const standardDelay = 5000
             let unsolved = true;
             let selectedTiles = [];
             let expressions = [];
             let hint_answer = [];
             let hint_level = 0;
+            let difficulty = '{{ difficulty|escapejs }}';  
 
             expressions = JSON.parse('{{ expressions|safe|escapejs }}');
             hint_answer=expressions[0];
+
+            headline.textContent = `sumfing ${difficulty}`;
     
             function checkExpression() {
                 const expression = [...boxes].map(box => box.dataset.value || '').join('');
@@ -196,7 +198,7 @@
                     document.getElementById('hint-level-input').value = hint_level;
                     nextButton.style.display = 'block';
                 } else {
-                    feedback.textContent = 'Incorrect';
+                    feedback.textContent = 'Not quite';
                 }
             }
 
@@ -241,7 +243,7 @@
                         if (hint_level===2) {showOperators()};
                         if (hint_level===3) {showAnswers()};
                         if (selectedTiles.length < boxes.length) {
-                            feedback.textContent = '({{ difficulty }})';
+                            feedback.textContent = '🤓';
                             nextButton.style.display = 'none';
                         }
                     }
@@ -412,8 +414,7 @@
                 showAnswers()
             };
 
-            feedback.textContent = '({{ difficulty }})';
-            tick.innerHTML = '';
+            feedback.textContent = '🤓';
             hint1Button.style.display = 'none';
             hint2Button.style.display = 'none';
             revealButton.style.display = 'none';
@@ -422,6 +423,7 @@
             setTimeout(() => {
                 if (getComputedStyle(nextButton).display === 'none') {
                     hint1Button.style.display = 'block';
+                    feedback.textContent = '🤓';
                 }
             }, standardDelay);
 
