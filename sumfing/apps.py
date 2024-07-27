@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class NumblerConfig(AppConfig):
+class SumfingConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'numbler'
+    name = 'sumfing'

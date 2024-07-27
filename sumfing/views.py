@@ -20,10 +20,10 @@ def welcome(request):
     request.session['puzzle']=puzzle
     request.session['date_str']=date_str
 
-    return redirect('numbler')
+    return redirect('sumfing')
 
 
-def numbler(request):
+def sumfing(request):
     
     puzzle = request.session['puzzle']
     num_tiles = puzzle['Tiles']
@@ -46,7 +46,7 @@ def numbler(request):
         'expressions': json.dumps(expressions)
     }
 
-    return render(request, 'numbler.html', context)
+    return render(request, 'sumfing.html', context)
 
 
 def next_puzzle(request):
@@ -105,18 +105,18 @@ def next_puzzle(request):
             elif hints_given[i]=='0':
                 result = "✅"
             elif hints_given[i]=='1':
-                result =f'💡1 hint'
+                result =f'💡'
             elif hints_given[i]=='2':
-                result =f'💡💡2 hints'
+                result =f'💡💡'
             elif hints_given[i]=='3':
                 result = "❌"
             hints_message.append(result)    
         
         date_str = request.session['date_str']
-        html_message = f'NumGoose 🪿 {date_str}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n'
-        whatsapp_message = f'NumGoose 🪿 {date_str}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nnyberry.pythonanywhere.com'
+        html_message = f'sum🎓fing {date_str}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n'
+        whatsapp_message = f'sum🎓fing {date_str}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nsumfing.com'
            
-        next_game_message = f"Next puzzle in {hours} hours and {minutes} minutes"
+        next_game_message = f"sum🎓fing else in {hours} hours and {minutes} minutes"
 
 
         context = {
@@ -127,4 +127,4 @@ def next_puzzle(request):
 
         return render (request, 'completed.html', context)
         
-    return numbler(request)
+    return sumfing(request)
