@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 import json
 import datetime
+from django.views.decorators.csrf import csrf_protect
 
+@csrf_protect
 def welcome(request):
 
     puzzles = {'2024-07-25': {'Tiles': ['2', '2', '6', '5'], 'Easy': (14, ['6*2+2', '2+6*2', '2*6+2', '2+2*6']), 'Medium': (20, ['52/2-6']), 'Hard': (688, ['6!-2^5'])}, '2024-07-26': {'Tiles': ['3', '3', '2', '4'], 'Easy': (10, ['3*2+4', '3*4-2', '2*3+4', '4+3*2', '4+2*3', '4*3-2']), 'Medium': (95, ['23*4+3', '4*23+3','3+23*4', '3+4*23']), 'Hard': (228, ['234-3!'])}, '2024-07-27': {'Tiles': ['4', '1', '3', '5'], 'Easy': (16, ['1+3*5', '1+5*3', '3*5+1', '5*3+1','4*3+1','4*1+3','3+1*4','1+3*4','5-1*4','4*5-1']), 'Medium': (37, ['14*3-5', '3*14-5']), 'Hard': (219, ['3^5-4!'])}, '2024-07-28': {'Tiles': ['1', '9', '8', '4'], 'Easy': (16, ['9+8-1', '9-1+8', '8+9-1', '8-1+9']), 'Medium': (56, ['9+48-1', '9-1+48', '8+49-1', '8-1+49', '49+8-1', '49-1+8', '48+9-1', '48-1+9']), 'Hard': (183, ['8*4!-9', '4!*8-9'])}, '2024-07-29': {'Tiles': ['1', '4', '6', '1'], 'Easy': (9, ['4+6-1', '4-1+6', '6+4-1', '6-1+4']), 'Medium': (83, ['14*6-1', '6*14-1']), 'Hard': (92, ['116-4!'])}}
@@ -22,7 +24,7 @@ def welcome(request):
 
     return redirect('sumfing')
 
-
+@csrf_protect
 def sumfing(request):
     
     puzzle = request.session['puzzle']
@@ -48,7 +50,7 @@ def sumfing(request):
 
     return render(request, 'sumfing.html', context)
 
-
+@csrf_protect
 def next_puzzle(request):
 
     if 'hints' not in request.session:
