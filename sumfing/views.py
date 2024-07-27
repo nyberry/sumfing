@@ -122,7 +122,7 @@ def next_puzzle(request):
         html_message = f'Sumfing #{game_no} {date_str}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n'
         whatsapp_message = f'Sumfing #{game_no} {date_str}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nPlay at sumfing.com'
            
-        next_game_message = f"Sumfing else in {hours} hours and {minutes} minutes"
+        next_game_message = f"Sumfing else in\n{hours} hours and {minutes} minutes"
 
 
         context = {
