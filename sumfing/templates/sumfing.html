@@ -97,13 +97,6 @@
             margin-bottom: 10px;
         }
 
-        .tick {
-            display: block;
-            font-size: 80px;
-            color: green;
-            margin-top: 10px;
-        }
-
         #next-button, #reveal-button, #hint1-button, #hint2-button {
             display: none;
             position: relative;
@@ -118,7 +111,7 @@
         }
 
         #next-button {
-            background-color: rgb(15, 161, 15)
+            background-color: #25D366;
         }
 
 
@@ -185,12 +178,12 @@
             expressions = JSON.parse('{{ expressions|safe|escapejs }}');
             hint_answer=expressions[0];
 
-            headline.textContent = `sumfing ${difficulty}`;
+            headline.textContent = `Sumfing ${difficulty}`;
     
             function checkExpression() {
                 const expression = [...boxes].map(box => box.dataset.value || '').join('');
                 if (expressions.includes(expression)) {
-                    feedback.textContent = 'Correct✅';
+                    feedback.textContent = 'Correct ✅';
                     unsolved = false;
                     hint1Button.style.display = 'none'
                     hint2Button.style.display = 'none'
