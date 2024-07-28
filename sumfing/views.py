@@ -139,9 +139,13 @@ def completed(request):
         hints_message.append(result)    
     
     game_no = request.session['game_no']
-    time_taken = request.session['time_taken']
-    html_message = f'Sumfing #{game_no}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\nTime: {time_taken} seconds'
-    whatsapp_message = f'Sumfing #{game_no}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\nTime: {time_taken} seconds\nPlay at sumfing.com'
+    if 'time_taken' in request.session:
+        time_taken = request.session['time_taken']
+        time_taken_message = f'Time: {time_taken} seconds\n'
+    else:
+        time_taken_message = ''
+    html_message = f'Sumfing #{game_no}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n{time_taken_message}'
+    whatsapp_message = f'Sumfing #{game_no}\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n{time_taken_message}Play at sumfing.com'
 
     # Make next game message:
     # 1. Get the current date and time
