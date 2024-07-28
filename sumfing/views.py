@@ -103,8 +103,9 @@ def next_puzzle(request):
     elif current_difficulty == 'Hard':
         request.session['difficulty'] = 'Completed'
         current_time = time.time()
-        time_taken = int(current_time- request.session['start_time'])
-        request.session['time_taken'] = time_taken
+        if 'start_time' in request.session:
+            time_taken = int(current_time- request.session['start_time'])
+            request.session['time_taken'] = time_taken
 
     # If the puzzle completed
     if request.session['difficulty'] == 'Completed':
