@@ -142,7 +142,7 @@ def completed(request):
     game_no = request.session['game_no']
     if 'time_taken' in request.session:
         time_taken = request.session['time_taken']
-        time_taken_message = f'Time: {time_taken} seconds\n'
+        time_taken_message = f'🕒 {time_taken} seconds\n'
     else:
         time_taken_message = ''
     html_message = f'Sumfing #{game_no}\n\nEasy: {hints_message[0]}\nMedium: {hints_message[1]}\nHard: {hints_message[2]}\n\n{time_taken_message}'
