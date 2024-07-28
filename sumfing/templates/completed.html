@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sumfing</title>
     <style>
-
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -15,27 +14,27 @@
             justify-content: center;
             background-color: #e7e7e7;
         }
-        
+
         .container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;    /* Center-align the text */
+            text-align: center;
             margin-top: 50px;
             position: relative;
             min-height: 100vh;
             font-size: 24px;
         }
         #resultMessage {
-            white-space: pre-line; /* Ensure new lines are displayed in HTML */
-            text-align: center;    /* Center-align the text */
-            width: 100%;           /* Optional: make the div take full width */
-            max-width: 500px;      /* Optional: set a maximum width */
-            margin: 0 auto;        /* Optional: center the div itself */
+            white-space: pre-line;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         #shareButton {
-            background-color: #25D366; /* WhatsApp green color */
+            background-color: #25D366;
             color: white;
             border: none;
             padding: 15px 30px;
@@ -49,37 +48,47 @@
             margin-top: 20px;
         }
         #shareButton:hover {
-            background-color: #1EBE56; /* Slightly darker green */
+            background-color: #1EBE56;
         }
         #shareButton:active {
-            background-color: #148F3D; /* Even darker green */
+            background-color: #148F3D;
         }
         #shareButton i {
-            margin-right: 10px; /* Space between icon and text */
+            margin-right: 10px;
         }
     </style>
+</head>
 <body>
     <div class="container">
         <div id="resultMessage">{{ html_message }}</div>
         <div id="whatsappMessage" style="display: none;">{{ whatsapp_message }}</div>
         <br>
         <!-- Button to share result by WhatsApp -->
-        <button id="shareButton" onclick="shareByWhatsApp()">
-        Share
+        <button id="shareButton" onclick="shareResult()">
+            Share
         </button>
         <br>
         <div>{{ next_game_message }}</div>
     </div>
 
     <script>
-        // Function to share result by WhatsApp
-        function shareByWhatsApp() {
-            var result = document.getElementById('whatsappMessage').innerText;
-            var whatsappURL = "https://api.whatsapp.com/send?text=" + encodeURIComponent(result);
-
-            // Open the WhatsApp URL in a new tab/window
-            window.open(whatsappURL, '_blank');
+   
+    // Function to share result
+    async function shareResult() {
+        var result = document.getElementById('whatsappMessage').innerText;
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'I did Sumfing',
+                    text: result,
+                });
+            } catch (error) {
+                console.error('Error sharing Wordle results:', error);
+            }
+        } else {
+            console.log('Web Share API is not supported in this browser');
         }
+    }
     </script>
 </body>
 </html>
