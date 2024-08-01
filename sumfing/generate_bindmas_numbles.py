@@ -183,7 +183,7 @@ def generate_puzzle():
 puzzles = {}
 start_date = datetime.today()
 
-for i in range (5):
+for i in range (10):
     date = start_date + timedelta(days=i)
     date_str = date.strftime("%Y-%m-%d")
     puzzle = None
