@@ -7,9 +7,7 @@ from datetime import datetime, timedelta
 # Define the tiles
 
 nums = ['1','2','3','4','5','6','7','8','9']
-ops1 = ['+','-','*','/']
-ops2= ['^', '!']
-ops = ops1+ops2
+ops = ['+','-','*','/']
 
 
 # Define the levels of difficulty
@@ -23,17 +21,17 @@ def settings(difficulty):
     if difficulty == "Easy":
         min_tiles, max_tiles = 5,5
         min_answer, max_answer = 0,20
-        operators = ops1
+        operators = ops
     
     elif difficulty == "Medium":
         min_tiles, max_tiles = 5,6
         min_answer, max_answer = 20,50
-        operators = ops1
+        operators = ops
 
     elif difficulty == "Hard":
-        min_tiles, max_tiles = 5,6
-        min_answer, max_answer = 50,10000
-        operators = ops1+ops2
+        min_tiles, max_tiles = 6,6
+        min_answer, max_answer = 50,200
+        operators = ops
     
     else:
         print("difficulty not specified")
@@ -84,13 +82,13 @@ def evaluate_L2R(expr):
     if not tokens:
         return None
 
-    # Convert the first token to a number
+    # Convert the last token to a number
     result = float(tokens.pop(0))
 
     while tokens:
-        # Get the operator
+        # Get the operator before it
         operator = tokens.pop(0)
-        # Get the next token. Return None if it's not a number (invalid expression)
+        # Get the token before it. Return None if it's not a number (invalid expression)
         try:
             next_number = float(tokens.pop(0))
       
@@ -110,6 +108,27 @@ def evaluate_L2R(expr):
 
     return result
 
+
+def check_for_fraction_step(expr):
+
+    try:
+
+        # Tokenize the expression
+        expr = "0"+expr
+        tokens = re.findall(r'\d+|[+\-/^*]', expr)
+
+        operator1 = tokens[1]
+        if operator1 == '/':
+            term1 = tokens[0]
+            term2 = tokens[2]
+            if term1 / term2 != int (term1 / term2):
+                return True    
+        
+        return False
+
+    except:
+
+        return False
 
 # Function to generate all valid sums which can be made using the tiles
 def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
@@ -165,7 +184,7 @@ def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
                                         L2R_sums[L2R_result].append(expr)
 
     # Lets only have sums that evaluate both by Bidmas and L2R
-    valid_sums = {}
+    selected_sums = {}
     for result,expr in bidmas_sums.items():
         if result in L2R_sums:
                            
@@ -173,9 +192,16 @@ def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
             common_exprs = list(set(expr) & set(L2R_sums[result]))
 
             if common_exprs:
-                valid_sums[result]=common_exprs
+                selected_sums[result]=common_exprs
 
-    return valid_sums
+    # Check for the case that the default answer results in a fraction after the first operation
+    for result,expr in selected_sums.items():
+        solution = expr[0]
+        if check_for_fraction_step(solution):
+            selected_sums[result][0].remove()
+            selected_sums[result].append(solution)
+
+    return selected_sums
 
 
 def factorial(n):
