@@ -4,19 +4,23 @@ import re
 import math
 from datetime import datetime, timedelta
 
+# This program will generate daily maths puzzles, for a specified number of days.
+# Each day's will have an easy puzzle, a medium puzzle and a hard puzzle.
+# 4 number tiles are selected at random. The day's puzzles need to be solved using those tiles.
+
 # Define the tiles
 
 nums = ['1','2','3','4','5','6','7','8','9']
 ops = ['+','-','*','/']
+extra_ops = ['^', '!']
 
-
-# Define the levels of difficulty
-# This program will generate 3 maths puzzles.
-# EASY will have either 3, 4 or 5 tiles and one or two operator
-# MEDIUM will have either 5 or 6 tiles and one or two operators
-# HARD will have either 5 or 6 tiles and will use an extended set of operators
 
 def settings(difficulty):
+
+    # Function to define the levels of difficulty
+    # EASY will have 5 tiles and two operators. This means all the number terms will have just 1 digit.
+    # MEDIUM will have either 5 or 6 tiles and one or two operators. This allows larger numbers to be formed with 2 or 3 digits.
+    # HARD will have 6 tiles and the answer will be a larger number than at the easy and medium levels.
 
     if difficulty == "Easy":
         min_tiles, max_tiles = 5,5
@@ -31,7 +35,7 @@ def settings(difficulty):
     elif difficulty == "Hard":
         min_tiles, max_tiles = 6,6
         min_answer, max_answer = 50,200
-        operators = ops
+        operators = ops # optionally, append extra_ops
     
     else:
         print("difficulty not specified")
@@ -41,7 +45,8 @@ def settings(difficulty):
 
 
 def format_for_factorials(expr):
-    # Replace factorial notation with math.factorial function calls
+
+    # Function to replace factorial notation with math.factorial function calls
 
     def factorial_replacer(match):
         number = int(match.group(1))
@@ -62,7 +67,8 @@ def format_for_factorials(expr):
 
 def format_for_indices(expr):
     
-    # replace exponent operator
+    # function replace exponent operator '^' with '**' and exclude invalid compound operations
+
     if '^' in expr:
         for substring in ['^+', '^/', '^^', '^!', '^*', '-^', '+^', '/^', '*^']:
             if substring in expr:
@@ -74,6 +80,8 @@ def format_for_indices(expr):
 
 
 def evaluate_L2R(expr):
+
+    # function to evaluate an expression from left to right
 
     # Tokenize the expression
     expr = "0"+expr
@@ -111,6 +119,8 @@ def evaluate_L2R(expr):
 
 def check_for_fraction_step(expr):
 
+    # functon to check if the first two terms evaluate to a fraction: we don't want that, it's messy.
+
     try:
 
         # Tokenize the expression
@@ -130,15 +140,20 @@ def check_for_fraction_step(expr):
 
         return False
 
-# Function to generate all valid sums which can be made using the tiles
 def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
+
+    
+    # Function to generate all valid sums which can be made using the tiles
+
     bidmas_sums = {}
     L2R_sums = {}
     
     # Iterate over lengths from 1 to num_tiles
     for length in range (1,max_tiles+1):
+
         for r in range(1, length+1):
             # Generate all permutations of the given length
+
             for perm in itertools.permutations(tiles, r):
                 expr = ''.join(perm)
                 
@@ -175,6 +190,7 @@ def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
                         
                         if L2R_result:
                             if  L2R_result >= min_answer and L2R_result <= max_answer and L2R_result == int(L2R_result):
+
                                 # We have a sum which can be made L to R. Add it to the dictionary 
                                 L2R_result = int(L2R_result)
                                 if L2R_result not in L2R_sums:
@@ -183,18 +199,18 @@ def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
                                     if expr not in L2R_sums[L2R_result]:
                                         L2R_sums[L2R_result].append(expr)
 
-    # Lets only have sums that evaluate both by Bidmas and L2R
+    # Lets only keep result keys that evaluate both by Bidmas and L2R
     selected_sums = {}
     for result,expr in bidmas_sums.items():
         if result in L2R_sums:
                            
-            # add the matching epxressions only to valid sums list
+            # add the matching epxressions only to valid sums dictionary
             common_exprs = list(set(expr) & set(L2R_sums[result]))
 
             if common_exprs:
                 selected_sums[result]=common_exprs
 
-    # Check for the case that the default answer results in a fraction after the first operation
+    # Check for the case that the default answer results in a fraction after the first operation. We don't want that. Messy.
     for result,expr in selected_sums.items():
         solution = expr[0]
         if check_for_fraction_step(solution):
@@ -204,21 +220,14 @@ def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
     return selected_sums
 
 
-def factorial(n):
-    ans = 1
-    for i in range(1,n+1):
-        ans*=i
-    return(ans)
-
-
 def generate_good_sums(level, tiles, min_tiles ,max_tiles, min_answer, max_answer):
+
+    # Function to generate a dictionary of answer:[expressions] we can use for a given level of difficulty and a given set of tiles
 
     # get all sums with a result in the valid range
     valid_sums = generate_valid_sums(tiles, max_tiles,min_answer, max_answer)
-    #print (f'Valid {level} results with up to {max_tiles} tiles: {len(valid_sums)}')
-    
-    # Select only sums with results which cannot be achieved with fewer tiles. It will be the shortest expressions for each result
-      
+   
+    # Select only sums with results which cannot be achieved with fewer tiles. It will be the shortest expressions for each result   
     shortest_sums = {}
     for (result, expressions) in valid_sums.items():
         expression_lengths = [len(expression) for expression in expressions]
@@ -260,8 +269,6 @@ def generate_good_sums(level, tiles, min_tiles ,max_tiles, min_answer, max_answe
                 if '*' not in expression and '/' not in expression and '^' not in expression and '!' not in expression:
                     del(good_sums[result])
                     break
-        
-    #print (f'Good {level} results with between {min_tiles} and {max_tiles} tiles: {len(good_sums)}')
     
     sorted_good_sums = sorted(good_sums.items(), key=lambda x: len(x[1]), reverse=True)
     return sorted_good_sums
@@ -269,10 +276,10 @@ def generate_good_sums(level, tiles, min_tiles ,max_tiles, min_answer, max_answe
 
 def generate_puzzle():
 
+    # function to generate a single day's puzzle
+
     numtiles = random.sample(nums,4)
-    #numtiles[0]=  random.choice(['1','2'])
     numtiles.sort()
-    #print (f'Number tiles: {numtiles}')
 
     # initiate a new puzzle dictionary
     puzzle = {'Tiles':numtiles}
@@ -281,9 +288,7 @@ def generate_puzzle():
     for level in ["Easy", "Medium", "Hard"]:
     
         (min_tiles, max_tiles, min_answer, max_answer, operators) = settings(level)
-        
         tiles = numtiles + operators
-        
         sums = generate_good_sums(level, tiles, min_tiles, max_tiles, min_answer, max_answer)
         
         if sums:
@@ -294,9 +299,11 @@ def generate_puzzle():
     return puzzle
 
 
-# Generate a dictionary of puzzles, where the key is the date
 
 def generate_puzzles(start_date, number_of_puzzles):
+
+    # Function to generate a dictionary of puzzles, where the key is the date
+
     puzzles = {}
 
     for i in range (number_of_puzzles):
