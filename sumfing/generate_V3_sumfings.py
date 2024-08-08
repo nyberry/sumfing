@@ -14,6 +14,8 @@ nums = ['1','2','3','4','5','6','7','8','9']
 ops = ['+','-','*','/']
 extra_ops = ['^', '!']
 
+times_tables_numbers = set([i*j for i in range (1,13) for j in range(1,13)])
+print (times_tables_numbers)
 
 def settings(difficulty):
 
@@ -82,24 +84,20 @@ def format_for_indices(expr):
 def evaluate_L2R(expr):
 
     # function to evaluate an expression from left to right
+    try:
 
-    # Tokenize the expression
-    expr = "0"+expr
-    tokens = re.findall(r'\d+|[+\-/^*]', expr)
+        # Tokenize the expression
+        tokens = re.findall(r'\d+|[+\-/^*]', expr)
     
-    if not tokens:
-        return None
+        # Convert the last token to a number
+        result = float(tokens.pop(0))
 
-    # Convert the last token to a number
-    result = float(tokens.pop(0))
-
-    while tokens:
-        # Get the operator before it
-        operator = tokens.pop(0)
-        # Get the token before it. Return None if it's not a number (invalid expression)
-        try:
+        while tokens:
+            # Get the operator before it
+            operator = tokens.pop(0)
+            # Get the token before it. Return None if it's not a number (invalid expression)
             next_number = float(tokens.pop(0))
-      
+        
             # Evaluate the expression from left to right
             if operator == '+':
                 result += next_number
@@ -111,8 +109,8 @@ def evaluate_L2R(expr):
                 result /= next_number
             elif operator == "^":
                 result = result**next_number
-        except:
-            return None
+    except:
+        return None
 
     return result
 
@@ -139,6 +137,44 @@ def check_for_fraction_step(expr):
     except:
 
         return False
+    
+
+def check_if_sum_is_times_tables_friendly(expr):
+
+    try:
+
+        # Tokenize the expression
+        expr = "0"+expr
+        tokens = re.findall(r'\d+|[+\-/^*]', expr)
+
+        # Convert the last token to a number
+        result = float(tokens.pop(0))
+
+        while tokens:
+            # Get the operator before it
+            operator = tokens.pop(0)
+            # Get the token before it. Return None if it's not a number (invalid expression)
+        
+            next_number = float(tokens.pop(0))
+    
+            # Evaluate the expression from left to right
+            if result not in times_tables_numbers or next_number not in times_tables_numbers:
+                    return None
+            if operator == '+':
+                result += next_number
+            elif operator == '-':
+                result -= next_number
+            elif operator == '*':
+                result *= next_number
+            elif operator == '/':
+                result /= next_number
+            elif operator == "^":
+                result = result**next_number
+    except:
+        return None
+
+    return result
+
 
 def generate_valid_sums(tiles, max_tiles, min_answer, max_answer):
 
@@ -261,6 +297,10 @@ def generate_good_sums(level, tiles, min_tiles ,max_tiles, min_answer, max_answe
         # no medium sums with 5 tiles and 2 operators (those are easy)
             if level == "Medium":
                 if expression[1] in operators and expression[3] in operators:
+                    del(good_sums[result])
+                    break
+
+                if not check_if_sum_is_times_tables_friendly(expression):
                     del(good_sums[result])
                     break
             
