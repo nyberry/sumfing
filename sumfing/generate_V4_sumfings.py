@@ -39,7 +39,7 @@ def settings(difficulty):
         times_tables = True
 
     elif difficulty == "Hard":
-        min_tiles, max_tiles = 5,6
+        min_tiles, max_tiles = 4,6
         min_answer, max_answer = 50,200
         operators = ops
         block_fractions = False
@@ -362,9 +362,9 @@ def generate_puzzles(start_date, number_of_puzzles):
             puzzle = generate_puzzle()
             if puzzle in puzzles.items():
                 puzzle = None
+            print (puzzle)
         puzzles[date_str]=puzzle
-        print(puzzle)
-
+        
     return puzzles
 
 
