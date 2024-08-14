@@ -104,7 +104,7 @@ def next_puzzle(request):
     elif current_difficulty == 'Medium':
         request.session['difficulty'] = 'Hard'
     elif current_difficulty == 'Hard':
-        if request.session['hints'][0:2]==['0','0','0']:
+        if request.session['hints'][0:3]==['0','0','0']:
             request.session['difficulty'] = 'Extra'
         else:
             request.session['difficulty'] = 'Completed'
