@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 # Define the tiles
 
-nums = ['1','2','3','4','5','6','7','8','9']
+nums = ['0','1','2','3','4','5','6','7','8','9']
 ops = ['+','-','*','/']
 extra_ops = ['^', '!']
 
@@ -37,8 +37,14 @@ def settings(difficulty):
 
     elif difficulty == "Hard":
         min_tiles, max_tiles = 5,6
-        min_answer, max_answer = 100,500
+        min_answer, max_answer = 100,200
         operators = ops
+        times_tables = False
+
+    elif difficulty == "Extra":
+        min_tiles, max_tiles = 5,6
+        min_answer, max_answer = 100,1000
+        operators = ops + extra_ops
         times_tables = False
     
     else:
@@ -275,21 +281,9 @@ def generate_good_sums(level, tiles, min_tiles ,max_tiles, min_answer, max_answe
         operators=['+','-','/','*','^','!']
     
         for expression in expressions:
-
-        # From 'easy sums', exclude those without 5 tiles and 2 operators (those are medium)
-        #    if level == "Easy":
-        #        if expression[1] not in operators or expression[3] not in operators:
-        #            del(good_sums[result])
-        #            break
-                
-        # no medium sums with 5 tiles and 2 operators (those are easy)
-        #    if level == "Medium":
-        #        if expression[1] in operators and expression[3] in operators:
-        #            del(good_sums[result])
-        #            break
             
         # hard sums cannot only include + and -
-            if level == "Hard":
+            if level == "Extra":
                 if '*' not in expression and '/' not in expression and '^' not in expression and '!' not in expression:
                     del(good_sums[result])
                     break
@@ -309,7 +303,7 @@ def generate_puzzle():
     puzzle = {'Tiles':numtiles}
 
     # get the easy, medium and hard sums
-    for level in ["Easy", "Medium", "Hard"]:
+    for level in ["Easy", "Medium", "Hard", "Extra"]:
     
         (min_tiles, max_tiles, min_answer, max_answer, operators, times_tables) = settings(level)
         tiles = numtiles + operators
@@ -338,7 +332,6 @@ def generate_puzzles(start_date, number_of_puzzles):
             puzzle = generate_puzzle()
             if puzzle in puzzles.items():
                 puzzle = None
-            print (puzzle)
         puzzles[date_str]=puzzle
         
     return puzzles
