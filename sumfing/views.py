@@ -34,7 +34,7 @@ def index(request):
     request.session['puzzle']=puzzle
     request.session['date_str']=today_str
     request.session['game_no']=days_since_start
-    request.session['start_time']=current_time
+    request.session['hints']=['-1','-1','-1','-1']
     return redirect('sumfing')
 
 
