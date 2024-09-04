@@ -125,39 +125,14 @@ def evaluate_L2R(expr):
 
 def check_if_sum_is_times_tables_friendly(expr):
 
-    try:
-
-        # Tokenize the expression
-        expr = "0"+expr
-        tokens = re.findall(r'\d+|[+\-/^*]', expr)
-
-        # Convert the last token to a number
-        result = float(tokens.pop(0))
-
-        while tokens:
-            # Get the operator before it
-            operator = tokens.pop(0)
-            # Get the token before it. Return None if it's not a number (invalid expression)
-        
-            next_number = float(tokens.pop(0))
+    # Extract all numbers in the expression
+    numbers = re.findall(r'\b\d+\b', expr)
     
-            # Evaluate the expression from left to right
-            if result not in times_tables_numbers or next_number not in times_tables_numbers:
-                    return None
-            if operator == '+':
-                result += next_number
-            elif operator == '-':
-                result -= next_number
-            elif operator == '*':
-                result *= next_number
-            elif operator == '/':
-                result /= next_number
-            elif operator == "^":
-                result = result**next_number
-    except:
-        return None
-
-    return result
+    # Convert numbers to integers
+    numbers = [int(num) for num in numbers]
+    
+    # Check if all numbers are in the set, return a boolean
+    return all(num in times_tables_numbers for num in numbers)
 
 
 def generate_valid_sums(tiles, max_tiles, min_answer, max_answer, times_tables):
@@ -239,13 +214,6 @@ def generate_valid_sums(tiles, max_tiles, min_answer, max_answer, times_tables):
                 if expression not in common_exprs:
                     selected_sums[result].append(expression)
 
-   # go through the list again, adding expressions that only work L2R
-   # for result,expressions in L2R_sums.items():
-   #     if result in selected_sums:
-   #         common_exprs = list(set(expressions) & set(bidmas_sums[result]))
-   #         for expression in expressions:
-    #            if expression not in common_exprs:
-    #                selected_sums[result].append(expression)
         
     return selected_sums
 
@@ -281,6 +249,13 @@ def generate_good_sums(level, tiles, min_tiles ,max_tiles, min_answer, max_answe
         operators=['+','-','/','*','^','!']
     
         for expression in expressions:
+
+        # easy sums must be times table friendly
+            if level == "Easy":
+                if not check_if_sum_is_times_tables_friendly(expression):
+                    del(good_sums[result])
+                    break
+
             
         # hard sums cannot only include + and -
             if level == "Extra":
