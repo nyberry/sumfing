@@ -257,11 +257,12 @@ def generate_good_sums(level, tiles, min_tiles ,max_tiles, min_answer, max_answe
                     break
 
             
-        # hard sums cannot only include + and -
+        # bonus sums cannot only include + and -
             if level == "Extra":
                 if '*' not in expression and '/' not in expression and '^' not in expression and '!' not in expression:
                     del(good_sums[result])
                     break
+                
     
     sorted_good_sums = sorted(good_sums.items(), key=lambda x: len(x[1]), reverse=True)
     return sorted_good_sums
@@ -315,7 +316,7 @@ def generate_puzzles(start_date, number_of_puzzles):
 # main
 
 start_date = datetime.today()
-number_of_puzzles = 30
+number_of_puzzles = 95
 puzzles = generate_puzzles(start_date, number_of_puzzles)
 
 print(puzzles)
